@@ -686,13 +686,19 @@
 >
 > A。接口查询是否成功，要在运行期才能够确定。
 >
-> 拓展：go语言之类型与接口的关系 https://blog.csdn.net/jkwanga/article/details/107109449
+> 拓展：go语言之类型与接口的关系
 >
-> 类型是啥？
+> `rune`类型是啥？
 >
 > https://polarisxu.studygolang.com/posts/go/action/type-and-alias/
 >
-> **8、Go****当中同步锁有什么特点？作用是什么**
+>  https://blog.csdn.net/jkwanga/article/details/107109449
+>
+> 类型  是什么  ？ https://www.cnblogs.com/cheyunhua/p/16007219.html
+>
+> **8、Go** **当中同步锁有什么特点？作用是什么**
+>
+> 锁：https://time.geekbang.org/column/article/297868、 https://cloud.tencent.com/developer/article/2413032
 >
 > 当一个Goroutine（协程）获得了Mutex后，其他Goroutine（协程）就只能乖
 >
@@ -706,9 +712,23 @@
 >
 > 保证系统的稳定性。
 >
+> 参考： https://tongyi.aliyun.com/qianwen/share?shareId=f0667914-2d4e-40c0-af4f-47f9aa57381b
+> 如果未释放锁而协程挂了，会死锁么？
+>
+> =》 https://tongyi.aliyun.com/qianwen/share?shareId=1d3f1ea0-6d45-4e0b-9245-4552dc4a34f6
+>
+> Mutex ： 一人持锁，其他读写全阻塞
+>
+> RWMutex ： 一人持锁，其他读写全阻塞
+>
+> 原理流程图： https://www.topgoer.cn/docs/gozhuanjia/gozhuanjiarwmutex
+>
+> **跟 mysql数据库的原子操作是同一个道理(bu)**
+>
+>
 > **9、Go** **语言当中** **Channel（通道）有什么特点，需要注意什么？**
 >
-> 如果给一个 nil 的 channel 发送数据，会造成永远阻塞。
+> 如果给一个 nil 的 channel 发送数据，会造成永远阻塞。 原因： https://tongyi.aliyun.com/qianwen/share?shareId=95dba796-75f9-44e1-94ac-cb6d2558872f
 >
 > 如果从一个 nil 的 channel 中接收数据，也会造成永久阻塞。
 >
@@ -718,7 +738,7 @@
 >
 > 值。
 >
-> 11
+> **所以判断 channel 是否结束=》判断返回值是否 nil**
 >
 > **10、Go** **语言当中** **Channel** **缓冲有什么特点？**
 >
@@ -726,8 +746,13 @@
 >
 > **11、Go** **语言中** **cap** **函数可以作用于哪些内容？**
 >
-> <img src="./5jqhti5r.png"
-> style="width:5.76319in;height:5.77014in" />可以作用于的类型有：
+> 如何理解 切片 https://blog.csdn.net/weixin_41044151/article/details/117921079
+>
+> cap 方法有什么作用？==》内存管理 && 获取 容量大小内存管理
+>
+> https://tongyi.aliyun.com/qianwen/share?shareId=3d0a5124-3bec-4bc3-b22a-5acefdb550e9
+>
+> 可以作用于的类型有：
 >
 > ⚫ array(数组)
 >
@@ -851,27 +876,53 @@
 >
 > 1024,1280,1696,2304
 >
-> 每次都是扩容了四分之一左右
+> **每次都是扩容了四分之一左右**(第一次听说)
 >
 > 14
 >
-> **20、看下面代码的** **defer** **的执行顺序是什么？** **defer**
-> **的作用和特**
->
-> **点是什么？**
+> **20、看下面代码的** **defer** **的执行顺序是什么？** **defer的作用和特点是什么？**
 >
 > defer的作用是：
 >
-> 你只需要在调用普通函数或方法前加上关键字defer，就完成了defer所需要
+> 你只需要在调用普通函数或方法前加上关键字defer，就完成了defer所需要语法。当defer语句被执行时，跟在defer后面的函数会被延迟执行。直到包含该defer语句的函数执行完毕时，defer后的函数才会被执行，不论包含defer语句的函数是通过return正常结束，还是由于panic导致的异常结束。你可以在一个函数中执行多条defer语句，它们的执行顺序与声明顺序相反。
 >
-> <img src="./njscotuf.png"
-> style="width:5.76319in;height:5.77014in" />的语法。当defer语句被执行时，跟在defer后面的函数会被延迟执行。直到
+> 先进后出
 >
-> 包含该defer语句的函数执行完毕时，defer后的函数才会被执行，不论包含
+> defer 中可以嵌套 defer 么？
 >
-> defer语句的函数是通过return正常结束，还是由于panic导致的异常结束。
+> ```
+> 是的，在Go语言中，您可以嵌套使用defer语句。这意味着您可以在一个defer语句内部再次使用defer，形成多层延迟调用。每个defer都会按照其声明的顺序逆序执行。下面是一个简单的例子来说明这一点：
 >
-> 你可以在一个函数中执行多条defer语句，它们的执行顺序与声明顺序相反。
+> package main
+>
+> import "fmt"
+>
+> func main() {
+>     fmt.Println("Starting")
+>
+>     defer fmt.Println("First deferred call")
+>   
+>     defer func() {
+>         fmt.Println("Second deferred call (inner)")
+>   
+>         // 在这个匿名函数内部再嵌套一个defer
+>         defer fmt.Println("Third deferred call (nested inside second)")
+>   
+>         fmt.Println("Before third deferred call in the inner defer")
+>     }()
+>   
+>     fmt.Println("Before first deferred call")
+> }
+>
+> 这段代码执行时会输出：
+>
+> Starting
+> Before first deferred call
+> Second deferred call (inner)
+> Before third deferred call in the inner defer
+> Third deferred call (nested inside second)
+> First deferred call
+> ```
 >
 > defer的常用场景：
 >
@@ -907,7 +958,10 @@
 >
 > ⚫ 切片的容量
 >
-> 15
+> 发生写时复制后，来自同一个引用的切片 就后变成独立的内存了
+>
+> 不发生 写时复制 则，都是同一个底层引用，修改原位置内容，两个切片都会变化
+>
 >
 > **22、Golang** **Slice** **的扩容机制，有什么注意点？**
 >
@@ -919,9 +973,7 @@
 >
 > ⚫ 否则判断，如果旧切片的长度小于1024，则最终容量就是旧容量的两倍
 >
-> <img src="./qkegdxlg.png"
-> style="width:5.76319in;height:5.77014in" />⚫
-> 否则判断，如果旧切片长度大于等于1024，则最终容量从旧容量开始循环
+> ⚫否则判断，如果旧切片长度大于等于1024，则最终容量从旧容量开始循环
 >
 > 增加原来的 1/4, 直到最终容量大于等于新申请的容量
 >
@@ -945,7 +997,7 @@
 >
 > 原数组。
 >
-> 要复制一个Slice，最好使用Copy函数。
+> **要复制一个Slice，最好使用Copy函数。**
 >
 > **24、Golang** **的参数传递、引用类型**
 >
@@ -1015,21 +1067,13 @@
 >
 > oldbuckets查找。
 >
-> <img src="./re4nkypu.png"
-> style="width:5.76319in;height:5.77014in" />**28、介绍一下**
-> **Channel**
+> **28、介绍一下Channel**
 >
-> Go语言中，不要通过共享内存来通信，而要通过通信来实现内存共享。Go的
+> Go语言中，不要通过共享内存来通信，而要通过通信来实现内存共享。Go的CSP(Communicating Sequential Process)并发模型，中文可以叫做通信顺序进程，是通过goroutine和channel来实现的。
 >
-> CSP(Communicating Sequential Process)并发模型，中文可以叫做通信顺序进
+> channel收发遵循先进先出FIFO的原则。分为有缓冲区和无缓冲区，channel中包括buffer、sendx和recvx收发的位置(ring buffer记录实现)、sendq、recv。当channel因为缓冲区不足而阻塞了队列，则使用双向链表存储。
 >
-> 程，是通过goroutine和channel来实现的。
->
-> channel收发遵循先进先出FIFO的原则。分为有缓冲区和无缓冲区，channel
->
-> 中包括buffer、sendx和recvx收发的位置(ring buffer记录实现)、sendq、
->
-> recv。当channel因为缓冲区不足而阻塞了队列，则使用双向链表存储。
+> **如果需要先进后出 则需要自己实现一个队列来实现**
 >
 > **29、Go** **语言的** **Channel** **特性？**
 >
@@ -1688,6 +1732,12 @@
 > 为模型的小型自治服务集合。
 >
 > 34
+
+
+
+
+
+
 
 
 
